@@ -5,6 +5,12 @@ VisualStudioVersion = 17.14.36811.4 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.TransactionProcessor", "PagueVeloz.TransactionProcessor\PagueVeloz.TransactionProcessor.csproj", "{A1D504B5-0E96-495C-BD7D-4714A7F6C1EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.Domain", "PagueVeloz.Domain\PagueVeloz.Domain.csproj", "{653910A4-0468-477F-87EB-E0CB3EC2A636}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.Application", "PagueVeloz.Application\PagueVeloz.Application.csproj", "{32BAAB55-2E8E-4239-BB90-5113F3C46D51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.Repository", "PagueVeloz.Persistence\PagueVeloz.Repository.csproj", "{66C00F26-9552-4612-AEDF-E821DF2944D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{A1D504B5-0E96-495C-BD7D-4714A7F6C1EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1D504B5-0E96-495C-BD7D-4714A7F6C1EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1D504B5-0E96-495C-BD7D-4714A7F6C1EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{653910A4-0468-477F-87EB-E0CB3EC2A636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653910A4-0468-477F-87EB-E0CB3EC2A636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653910A4-0468-477F-87EB-E0CB3EC2A636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653910A4-0468-477F-87EB-E0CB3EC2A636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32BAAB55-2E8E-4239-BB90-5113F3C46D51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32BAAB55-2E8E-4239-BB90-5113F3C46D51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32BAAB55-2E8E-4239-BB90-5113F3C46D51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32BAAB55-2E8E-4239-BB90-5113F3C46D51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

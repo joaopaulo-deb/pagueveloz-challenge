@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,13 +16,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Contracts\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PagueVeloz.Application\PagueVeloz.Application.csproj" />
-    <ProjectReference Include="..\PagueVeloz.Domain\PagueVeloz.Domain.csproj" />
-    <ProjectReference Include="..\PagueVeloz.Persistence\PagueVeloz.Repository.csproj" />
   </ItemGroup>
 
 </Project>
