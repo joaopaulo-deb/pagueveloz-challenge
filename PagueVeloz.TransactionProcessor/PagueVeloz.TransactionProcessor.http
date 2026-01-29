@@ -1,0 +1,6 @@
+@PagueVeloz.TransactionProcessor_HostAddress = http://localhost:5093
+
+GET {{PagueVeloz.TransactionProcessor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
