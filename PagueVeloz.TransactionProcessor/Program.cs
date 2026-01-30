@@ -1,6 +1,10 @@
 
 using Microsoft.EntityFrameworkCore;
+using PagueVeloz.Application.Accounts;
+using PagueVeloz.Application.Contracts;
+using PagueVeloz.Application.Customers;
 using PagueVeloz.Repository.Context;
+using PagueVeloz.Repository.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

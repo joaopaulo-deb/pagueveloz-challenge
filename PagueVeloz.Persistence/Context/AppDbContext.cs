@@ -13,5 +13,15 @@ namespace PagueVeloz.Repository.Context
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Account> Account { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Account>()
+                .HasOne(a => a.Customer)
+                .WithMany(c => c.Accounts)
+                .HasForeignKey(a => a.CustomerId);
+        }
+
     }
 }
