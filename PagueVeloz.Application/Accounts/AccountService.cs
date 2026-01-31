@@ -37,12 +37,7 @@ namespace PagueVeloz.Application.Accounts
 
                 await _unitOfWork.CommitAsync();
 
-                return new Response<AccountCreateOutputDto>
-                {
-                    Data = ToOutputDto(account, customer),
-                    Message = "Conta criado com sucesso"
-                };
-
+                return Response<AccountCreateOutputDto>.Ok(ToOutputDto(account, customer), "Conta criado com sucesso");
             }
             catch (Exception ex)
             {

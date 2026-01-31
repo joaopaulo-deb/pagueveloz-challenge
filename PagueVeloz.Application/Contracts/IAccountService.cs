@@ -2,7 +2,6 @@
 
 using PagueVeloz.Application.Accounts;
 using PagueVeloz.Application.Common;
-using PagueVeloz.Domain.Entities;
 
 namespace PagueVeloz.Application.Contracts
 {

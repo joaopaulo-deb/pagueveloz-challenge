@@ -12,6 +12,7 @@ namespace PagueVeloz.Repository.Context
 
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Account> Account { get; set; }
+        public DbSet<Transaction> Transaction { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PagueVeloz.Domain.Enums
 {
     public enum OperationType
     {
+        credit = 1,
+        debit = 2,
+        reserve = 3,
+        capture = 4,
+        reversal = 5, 
+        transfer = 6
     }
 }

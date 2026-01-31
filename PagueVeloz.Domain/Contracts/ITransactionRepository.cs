@@ -4,8 +4,8 @@ using PagueVeloz.Repository.Contracts;
 
 namespace PagueVeloz.Application.Contracts
 {
-    public interface IAccountRepository : IBaseRepository<Account>
+    public interface ITransactionRepository : IBaseRepository<Transaction>
     {
-        Task<Account> GetByCodeAsync(string Code);
+        //Task<Transaction> GetByCodeAsync(string Code);
     }
 }

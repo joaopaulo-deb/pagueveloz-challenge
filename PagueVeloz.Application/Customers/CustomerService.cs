@@ -1,6 +1,8 @@
-﻿using PagueVeloz.Application.Common;
+﻿using PagueVeloz.Application.Accounts;
+using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
 using PagueVeloz.Domain.Entities;
+using System.Security.Principal;
 
 namespace PagueVeloz.Application.Customers
 {
@@ -22,12 +24,7 @@ namespace PagueVeloz.Application.Customers
                 _customerRepository.Create(customer);
                 await _customerRepository.SaveChangesAsync();
 
-                return new Response<CustomerCreateOutputDto>
-                {
-                    Data = ToOutputDto(customer),
-                    Message = "Cliente criado com sucesso"
-                };
-
+                return Response<CustomerCreateOutputDto>.Ok(ToOutputDto(customer), "Cliente criado com sucesso");
             }
             catch (Exception ex)
             {
