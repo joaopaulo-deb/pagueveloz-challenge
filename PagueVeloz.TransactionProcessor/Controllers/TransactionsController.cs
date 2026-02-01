@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PagueVeloz.Application.Contracts;
-using PagueVeloz.Application.Accounts;
-using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Transactions;
 
 namespace PagueVeloz.TransactionProcessor.Controllers
