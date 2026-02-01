@@ -16,7 +16,7 @@ namespace PagueVeloz.Application.Transactions
         public Currency Currency { get; set; }
         [Required]
         public string Reference_id { get; set; }
-        public OperationMetadataDto Metadata { get; set; }
+        public OperationMetadataDto? Metadata { get; set; }
     }
 
     public class OperationMetadataDto
