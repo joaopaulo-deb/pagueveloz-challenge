@@ -54,6 +54,10 @@ namespace PagueVeloz.Repository.Context
             modelBuilder.Entity<Account>()
                 .Property(a => a.Status)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Account>()
+            .Property(a => a.RowVersion)
+            .IsRowVersion();
         }
     }
 }

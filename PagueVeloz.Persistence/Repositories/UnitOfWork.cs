@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
 using PagueVeloz.Repository.Context;
 
@@ -29,9 +31,22 @@ namespace PagueVeloz.Repository.Repositories
             await _transaction!.RollbackAsync();
         }
 
+        public void ClearTracking()
+        {
+            _context.ChangeTracker.Clear();
+        }
+
+
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new ConcurrencyConflictException("Conta foi alterada por outra operação",ex );
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ namespace PagueVeloz.Domain.Entities
         public StatusAccount Status { get; private set; }
         public int ClientId { get; private set; }
         public Client Client { get; private set; }
+        public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
         private readonly List<Transaction> _transactionHistory = new();
         public IReadOnlyCollection<Transaction> TransactionHistory => _transactionHistory;
 

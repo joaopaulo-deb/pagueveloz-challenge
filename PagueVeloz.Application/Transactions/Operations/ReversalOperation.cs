@@ -1,4 +1,5 @@
-﻿using PagueVeloz.Application.Contracts;
+﻿using PagueVeloz.Application.Common;
+using PagueVeloz.Application.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
 
@@ -58,9 +59,18 @@ namespace PagueVeloz.Application.Transactions.Operations
                     timestamp = DateTime.UtcNow
                 };
             }
+            catch (ConcurrencyConflictException ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                _unitOfWork.ClearTracking();
+                await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.failed, "Conflito de concorrência");
+
+                return Fail(dto, "Conflito de concorrência: conta foi alterada por outra operação", account);
+            }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
+                _unitOfWork.ClearTracking();
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.failed, ex.Message);
                 return Fail(dto, ex.Message, account);
             }

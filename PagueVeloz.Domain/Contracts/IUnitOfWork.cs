@@ -7,5 +7,6 @@ namespace PagueVeloz.Application.Contracts
         Task CommitAsync();
         Task RollbackAsync();
         Task SaveChangesAsync();
+        void ClearTracking();
     }
 }

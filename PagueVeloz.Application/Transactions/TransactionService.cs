@@ -24,8 +24,6 @@ namespace PagueVeloz.Application.Transactions
                 var operation = ValidateAndGetOperation(input.Operation);
                 var account = await GetAndValidateAccount(input.Account_id);
 
-                //return await operation!.ExecuteAsync(account!, input);
-
                 if (operation is ISingleAccountOperation singleOp)
                 {
                     return await singleOp.ExecuteAsync(account, input);
