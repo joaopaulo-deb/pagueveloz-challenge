@@ -9,14 +9,14 @@ namespace PagueVeloz.Domain.Entities
         public int ReservedBalance { get; set; }
         public int CreditLimit { get; set; }
         public StatusAccount Status { get; private set; }
-        public int CustomerId { get; private set; }
-        public Customer Customer { get; private set; }
+        public int ClientId { get; private set; }
+        public Client Client { get; private set; }
         private readonly List<Transaction> _transactionHistory = new();
         public IReadOnlyCollection<Transaction> TransactionHistory => _transactionHistory;
 
-        public Account(int customerId, int creditLimit, int availableBalance)
+        public Account(int clientId, int creditLimit, int availableBalance)
         {
-            CustomerId = customerId;
+            ClientId = clientId;
             CreditLimit = creditLimit;
             AvailableBalance = availableBalance;
             ReservedBalance = 0;
@@ -115,12 +115,10 @@ namespace PagueVeloz.Domain.Entities
             destination.AvailableBalance += amount;
         }
 
-
-        public void Reversal(int amount)
+        public void Reversal()
         {
            
         }
-
 
         public void GenerateCode()
         {

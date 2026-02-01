@@ -41,7 +41,7 @@ namespace PagueVeloz.Application.Transactions.Operations
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                account.Reversal(dto.Amount);
+                account.Reversal();
                 _accountRepository.Update(account);
 
                 await _unitOfWork.SaveChangesAsync();

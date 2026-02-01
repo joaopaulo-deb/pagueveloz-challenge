@@ -1,8 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using PagueVeloz.Application.Accounts;
+using PagueVeloz.Application.Clients;
 using PagueVeloz.Application.Contracts;
-using PagueVeloz.Application.Customers;
 using PagueVeloz.Application.Transactions;
 using PagueVeloz.Application.Transactions.Operations;
 using PagueVeloz.Repository.Context;
@@ -28,8 +28,8 @@ builder.Services.AddSwaggerGen(_ =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();

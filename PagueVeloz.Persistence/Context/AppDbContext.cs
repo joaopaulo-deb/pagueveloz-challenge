@@ -10,7 +10,7 @@ namespace PagueVeloz.Repository.Context
         {
         }
 
-        public DbSet<Customer> Customer { get; set; }
+        public DbSet<Client> Client { get; set; }
         public DbSet<Account> Account { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
 
@@ -19,9 +19,9 @@ namespace PagueVeloz.Repository.Context
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Account>()
-                .HasOne(a => a.Customer)
+                .HasOne(a => a.Client)
                 .WithMany(c => c.Accounts)
-                .HasForeignKey(a => a.CustomerId);
+                .HasForeignKey(a => a.ClientId);
 
             modelBuilder.Entity<Transaction>(e =>
             {

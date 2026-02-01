@@ -1,8 +1,6 @@
 ﻿using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
-using PagueVeloz.Application.Customers;
 using PagueVeloz.Domain.Entities;
-using PagueVeloz.Repository.Contracts;
 using PagueVeloz.Repository.Repositories;
 
 namespace PagueVeloz.Application.Accounts
@@ -10,14 +8,14 @@ namespace PagueVeloz.Application.Accounts
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AccountService(IUnitOfWork unitOfWork, IAccountRepository accountRepository, ICustomerRepository customerRepository)
+        public AccountService(IUnitOfWork unitOfWork, IAccountRepository accountRepository, IClientRepository clientRepository)
         {
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
-            _customerRepository = customerRepository;
+            _clientRepository = clientRepository;
         }
         
         public async Task<Response<AccountCreateOutputDto>> Create(AccountCreateInputDto input)
@@ -26,10 +24,10 @@ namespace PagueVeloz.Application.Accounts
 
             try
             {
-                var customer = await GetOrCreateCustomerAsync(input.ClientId);
+                var client = await GetOrCreateClientAsync(input.ClientId);
                 await _unitOfWork.SaveChangesAsync();
                         
-                var account = CreateAccount(customer.Id, input );
+                var account = CreateAccount(client.Id, input );
                 await _unitOfWork.SaveChangesAsync();
 
                 account.GenerateCode();
@@ -37,7 +35,7 @@ namespace PagueVeloz.Application.Accounts
 
                 await _unitOfWork.CommitAsync();
 
-                return Response<AccountCreateOutputDto>.Ok(ToOutputDto(account, customer), "Conta criado com sucesso");
+                return Response<AccountCreateOutputDto>.Ok(ToOutputDto(account, client), "Conta criado com sucesso");
             }
             catch (Exception ex)
             {
@@ -46,23 +44,23 @@ namespace PagueVeloz.Application.Accounts
             }
         }
 
-        private async Task<Customer> GetOrCreateCustomerAsync(string clientId)
+        private async Task<Client> GetOrCreateClientAsync(string clientId)
         {
-            var customer = await _customerRepository.GetByCodeAsync(clientId);
+            var client = await _clientRepository.GetByCodeAsync(clientId);
 
-            if (customer != null)
-                return customer;
+            if (client != null)
+                return client;
 
-            customer = new Customer(clientId);
-            _customerRepository.Create(customer);
+            client = new Client(clientId);
+            _clientRepository.Create(client);
 
-            return customer;
+            return client;
         }
 
-        private Account CreateAccount(int customerId, AccountCreateInputDto input)
+        private Account CreateAccount(int clientId, AccountCreateInputDto input)
         {
             var account = new Account(
-                customerId,
+                clientId,
                 input.CreditLimit,
                 input.AvailableBalance
             );
@@ -72,12 +70,12 @@ namespace PagueVeloz.Application.Accounts
         }
 
 
-        private AccountCreateOutputDto ToOutputDto(Account account, Customer customer)
+        private AccountCreateOutputDto ToOutputDto(Account account, Client client)
         {
             return new AccountCreateOutputDto
             {
                 AccountId = account.Code,
-                ClientId = customer.Code
+                ClientId = client.Code
             };
         }
     }
