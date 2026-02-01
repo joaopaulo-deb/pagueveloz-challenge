@@ -1,11 +1,7 @@
-﻿using PagueVeloz.Application.Common;
-using PagueVeloz.Application.Contracts;
-using PagueVeloz.Application.Customers;
+﻿using PagueVeloz.Application.Contracts;
 using PagueVeloz.Application.Transactions.Operations;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
-using PagueVeloz.Repository.Repositories;
-using System.Security.Principal;
 
 namespace PagueVeloz.Application.Transactions
 {
@@ -28,7 +24,21 @@ namespace PagueVeloz.Application.Transactions
                 var operation = ValidateAndGetOperation(input.Operation);
                 var account = await GetAndValidateAccount(input.Account_id);
 
-                return await operation!.ExecuteAsync(account!, input);
+                //return await operation!.ExecuteAsync(account!, input);
+
+                if (operation is ISingleAccountOperation singleOp)
+                {
+                    return await singleOp.ExecuteAsync(account, input);
+                }
+
+                if (operation is ITransferOperation transferOp)
+                {
+                    var destination = await GetAndValidateAccount(input.Destination_account_id);
+
+                    return await transferOp.ExecuteAsync(account, destination, input);
+                }
+
+                throw new InvalidOperationException("Operação inválida");
             }
             catch (Exception ex)
             {
@@ -53,11 +63,6 @@ namespace PagueVeloz.Application.Transactions
             {
                 throw new Exception("Reference_id é obrigatório");
             }
-
-            if (string.IsNullOrWhiteSpace(dto.Currency))
-            {
-                throw new Exception("Currency é obrigatório");
-            }
         }
 
         private async Task<Account?> GetAndValidateAccount(string accountId)
@@ -72,14 +77,9 @@ namespace PagueVeloz.Application.Transactions
             return account;
         }
 
-        private IOperation? ValidateAndGetOperation(string operation)
+        private IOperation? ValidateAndGetOperation(OperationType operation)
         {
-            if (!Enum.TryParse<OperationType>(operation, true, out var operationType))
-            {
-                throw new Exception("Operação inválida");
-            }
-
-            return _operations.FirstOrDefault(_ => _.Type == operationType);
+            return _operations.FirstOrDefault(_ => _.Type == operation);
         }
     }
 }

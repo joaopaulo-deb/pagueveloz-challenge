@@ -5,16 +5,14 @@ using PagueVeloz.Repository.Repositories;
 
 namespace PagueVeloz.Application.Transactions.Operations
 {
-    public class DebitOperation : ISingleAccountOperation
+    public class CaptureOperation : ISingleAccountOperation
     {
-        public OperationType Type => OperationType.debit;
-
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private string DESCRIPTION = "Débito aprovado";
+        private string DESCRIPTION = "Captura da reserva";
 
-        public DebitOperation(
+        public CaptureOperation(
             IUnitOfWork unitOfWork,
             IAccountRepository accountRepository,
             ITransactionRepository transactionRepository)
@@ -22,7 +20,11 @@ namespace PagueVeloz.Application.Transactions.Operations
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
+
         }
+
+        public OperationType Type => OperationType.capture;
+
         public async Task<TransactionOutputDto> ExecuteAsync(Account account, TransactionInputDto dto)
         {
             var referenceId = dto.Reference_id.Trim().ToUpper();
@@ -39,24 +41,17 @@ namespace PagueVeloz.Application.Transactions.Operations
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-
-                account.Debit(dto.Amount);
+                account.Capture(dto.Amount);
                 _accountRepository.Update(account);
-
-                if(account.AvailableBalance < 0)
-                {
-                    DESCRIPTION = "Usou limite de crédito";
-                }
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.success);
 
-
                 return new TransactionOutputDto
                 {
-                    transaction_id = $"{dto.Reference_id}-PROCESSED",
+                    transaction_id = dto.Reference_id + "-PROCESSED",
                     status = TransactionStatus.success,
                     balance = account.AvailableBalance,
                     reserved_balance = account.ReservedBalance,
@@ -72,7 +67,7 @@ namespace PagueVeloz.Application.Transactions.Operations
             }
         }
 
-        private async Task<Transaction> CreatePendingTransactionAsync( Account account, TransactionInputDto dto, OperationType operation, string referenceId)
+        private async Task<Transaction> CreatePendingTransactionAsync(Account account,TransactionInputDto dto, OperationType operation, string referenceId)
         {
             var transaction = new Transaction(
                 operation,
@@ -90,7 +85,7 @@ namespace PagueVeloz.Application.Transactions.Operations
             return transaction;
         }
 
-        private async Task UpdateTransactionStatusAsync( int transactionId, TransactionStatus status, string? errorMessage = null)
+        private async Task UpdateTransactionStatusAsync(int transactionId, TransactionStatus status, string? errorMessage = null)
         {
             var transaction = await _transactionRepository.Get(transactionId);
             if (transaction == null) return;

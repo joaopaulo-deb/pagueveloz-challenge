@@ -5,16 +5,14 @@ using PagueVeloz.Repository.Repositories;
 
 namespace PagueVeloz.Application.Transactions.Operations
 {
-    public class DebitOperation : ISingleAccountOperation
+    public class TransferOperation : ITransferOperation
     {
-        public OperationType Type => OperationType.debit;
-
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private string DESCRIPTION = "Débito aprovado";
+        private string DESCRIPTION = "Transferência aprovada";
 
-        public DebitOperation(
+        public TransferOperation(
             IUnitOfWork unitOfWork,
             IAccountRepository accountRepository,
             ITransactionRepository transactionRepository)
@@ -22,45 +20,43 @@ namespace PagueVeloz.Application.Transactions.Operations
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
+
         }
-        public async Task<TransactionOutputDto> ExecuteAsync(Account account, TransactionInputDto dto)
+
+        public OperationType Type => OperationType.transfer;
+
+        public async Task<TransactionOutputDto> ExecuteAsync(Account sourceAccount, Account destinationAccount, TransactionInputDto dto)
         {
             var referenceId = dto.Reference_id.Trim().ToUpper();
 
-            var idempot = await _transactionRepository.GetByAccountAndReferenceIdAsync(account.Id, referenceId);
+            var idempot = await _transactionRepository.GetByAccountAndReferenceIdAsync(sourceAccount.Id, referenceId);
 
             if (idempot != null)
             {
-                return Fail(dto, "Operação já executada", account);
+                return Fail(dto, "Operação já executada", sourceAccount);
             }
 
-            var transaction = await CreatePendingTransactionAsync(account, dto, dto.Operation, referenceId);
+            var transaction = await CreatePendingTransactionAsync(sourceAccount, destinationAccount, dto, dto.Operation, referenceId);
 
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-
-                account.Debit(dto.Amount);
-                _accountRepository.Update(account);
-
-                if(account.AvailableBalance < 0)
-                {
-                    DESCRIPTION = "Usou limite de crédito";
-                }
+                sourceAccount.TransferTo(destinationAccount, dto.Amount);
+                _accountRepository.Update(sourceAccount);
+                _accountRepository.Update(destinationAccount);
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.success);
 
-
                 return new TransactionOutputDto
                 {
-                    transaction_id = $"{dto.Reference_id}-PROCESSED",
+                    transaction_id = dto.Reference_id + "-PROCESSED",
                     status = TransactionStatus.success,
-                    balance = account.AvailableBalance,
-                    reserved_balance = account.ReservedBalance,
-                    available_balance = account.AvailableBalance,
+                    balance = sourceAccount.AvailableBalance,
+                    reserved_balance = sourceAccount.ReservedBalance,
+                    available_balance = sourceAccount.AvailableBalance,
                     timestamp = DateTime.UtcNow
                 };
             }
@@ -68,21 +64,24 @@ namespace PagueVeloz.Application.Transactions.Operations
             {
                 await _unitOfWork.RollbackAsync();
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.failed, ex.Message);
-                return Fail(dto, ex.Message, account);
+                return Fail(dto, ex.Message, sourceAccount);
             }
         }
 
-        private async Task<Transaction> CreatePendingTransactionAsync( Account account, TransactionInputDto dto, OperationType operation, string referenceId)
+        private async Task<Transaction> CreatePendingTransactionAsync(Account sourceAccount, Account destinationAccount, TransactionInputDto dto, OperationType operation, string referenceId)
         {
             var transaction = new Transaction(
                 operation,
-                account.Id,
+                sourceAccount.Id,
                 dto.Amount,
                 TransactionStatus.pending,
                 dto.Currency,
                 referenceId,
                 DESCRIPTION
             );
+
+            // se você guarda conta destino na transaction
+            //transaction.SetDestinationAccount(destinationAccount.Id);
 
             _transactionRepository.Create(transaction);
             await _unitOfWork.SaveChangesAsync();
@@ -96,11 +95,6 @@ namespace PagueVeloz.Application.Transactions.Operations
             if (transaction == null) return;
 
             transaction.Status = status;
-
-            if (errorMessage is not null)
-            {
-                transaction.Description = errorMessage;
-            }
 
             _transactionRepository.Update(transaction);
             await _unitOfWork.SaveChangesAsync();
@@ -119,5 +113,6 @@ namespace PagueVeloz.Application.Transactions.Operations
                 error_message = message
             };
         }
+
     }
 }

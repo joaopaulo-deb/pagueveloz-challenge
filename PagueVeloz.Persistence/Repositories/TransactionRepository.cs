@@ -10,9 +10,13 @@ namespace PagueVeloz.Repository.Repositories
         public TransactionRepository(AppDbContext context) : base(context)
         { }
 
-        /*public Task<Transaction?> GetByCodeAsync(string Code)
+        public async Task<Transaction?> GetByAccountAndReferenceIdAsync(int accountId, string referenceId)
         {
-            return _context.Transaction.FirstOrDefaultAsync(_ => _.Code == Code);
-        }*/
+            return await _context.Transaction
+                .AsNoTracking()
+                .FirstOrDefaultAsync(_ =>
+                    _.AccountId == accountId &&
+                    _.ReferenceId == referenceId);
+        }
     }
 }

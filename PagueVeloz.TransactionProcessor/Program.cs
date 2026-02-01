@@ -36,6 +36,10 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IOperation, CreditOperation>();
 builder.Services.AddScoped<IOperation, DebitOperation>();
+builder.Services.AddScoped<IOperation, CaptureOperation>();
+builder.Services.AddScoped<IOperation, ReserveOperation>();
+builder.Services.AddScoped<IOperation, ReversalOperation>();
+builder.Services.AddScoped<IOperation, TransferOperation>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

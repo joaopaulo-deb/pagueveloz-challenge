@@ -7,7 +7,5 @@ namespace PagueVeloz.Application.Transactions.Operations
     public interface IOperation
     {
         OperationType Type { get; }
-        Task<TransactionOutputDto> ExecuteAsync(Account account, TransactionInputDto dto);
     }
-
 }

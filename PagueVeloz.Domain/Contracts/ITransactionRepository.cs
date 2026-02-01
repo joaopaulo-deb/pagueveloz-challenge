@@ -6,6 +6,6 @@ namespace PagueVeloz.Application.Contracts
 {
     public interface ITransactionRepository : IBaseRepository<Transaction>
     {
-        //Task<Transaction> GetByCodeAsync(string Code);
+        Task<Transaction?> GetByAccountAndReferenceIdAsync(int accountId, string referenceId);
     }
 }
