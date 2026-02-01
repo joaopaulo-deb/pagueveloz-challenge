@@ -1,7 +1,6 @@
 ﻿using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
 using PagueVeloz.Domain.Entities;
-using PagueVeloz.Repository.Repositories;
 
 namespace PagueVeloz.Application.Accounts
 {

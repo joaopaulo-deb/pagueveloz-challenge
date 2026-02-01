@@ -1,5 +1,7 @@
 ﻿
-namespace PagueVeloz.Application.Transactions
+using PagueVeloz.Application.Transactions;
+
+namespace PagueVeloz.Application.Contracts
 {
     public interface ITransactionService
     {

@@ -1,5 +1,4 @@
 ﻿using PagueVeloz.Domain.Enums;
-using System.Text.Json.Serialization;
 
 namespace PagueVeloz.Domain.Entities
 {

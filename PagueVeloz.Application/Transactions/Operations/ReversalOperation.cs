@@ -1,7 +1,6 @@
 ﻿using PagueVeloz.Application.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
-using PagueVeloz.Repository.Repositories;
 
 namespace PagueVeloz.Application.Transactions.Operations
 {
