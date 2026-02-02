@@ -2,7 +2,7 @@
 
 namespace PagueVeloz.Domain.Entities
 {
-    public class Transaction : BaseEntity
+    public sealed class Transaction : BaseEntity
     {
         public OperationType Operation { get; private set; }
         public int AccountId { get; private set; }

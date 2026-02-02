@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.Application", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagueVeloz.Repository", "PagueVeloz.Persistence\PagueVeloz.Repository.csproj", "{66C00F26-9552-4612-AEDF-E821DF2944D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{CE6E7A20-89DC-4685-8DF6-C96A8B0F2A7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66C00F26-9552-4612-AEDF-E821DF2944D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE6E7A20-89DC-4685-8DF6-C96A8B0F2A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE6E7A20-89DC-4685-8DF6-C96A8B0F2A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE6E7A20-89DC-4685-8DF6-C96A8B0F2A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE6E7A20-89DC-4685-8DF6-C96A8B0F2A7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

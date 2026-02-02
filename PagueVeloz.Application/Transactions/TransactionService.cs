@@ -67,7 +67,7 @@ namespace PagueVeloz.Application.Transactions
         {
             var account = await _accountRepository.GetByCodeAsync(accountId);
 
-            if (account is null || account.Status != StatusAccount.Active)
+            if (account is null || account.Status != AccountStatus.Active)
             {
                 throw new Exception("Conta inválida ou inativa");
             }

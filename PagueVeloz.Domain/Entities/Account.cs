@@ -2,13 +2,13 @@
 
 namespace PagueVeloz.Domain.Entities
 {
-    public class Account : BaseEntity
+    public sealed class Account : BaseEntity
     {
         public string? Code { get; set; }
         public int AvailableBalance { get; set; }
         public int ReservedBalance { get; set; }
         public int CreditLimit { get; set; }
-        public StatusAccount Status { get; private set; }
+        public AccountStatus Status { get; private set; }
         public int ClientId { get; private set; }
         public Client Client { get; private set; }
         public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
@@ -21,12 +21,12 @@ namespace PagueVeloz.Domain.Entities
             CreditLimit = creditLimit;
             AvailableBalance = availableBalance;
             ReservedBalance = 0;
-            Status = StatusAccount.Active;
+            Status = AccountStatus.Active;
         }
 
         public void Credit(int amount)
         {
-            if (Status != StatusAccount.Active)
+            if (Status != AccountStatus.Active)
                 throw new Exception("Conta inativa");
 
             if (amount <= 0)
@@ -37,7 +37,7 @@ namespace PagueVeloz.Domain.Entities
 
         public void Debit(int amount)
         {
-            if (Status != StatusAccount.Active)
+            if (Status != AccountStatus.Active)
                 throw new Exception("Conta inativa");
 
             if (amount <= 0)
@@ -59,7 +59,7 @@ namespace PagueVeloz.Domain.Entities
 
         public void Reserve(int amount)
         {
-            if (Status != StatusAccount.Active)
+            if (Status != AccountStatus.Active)
                 throw new Exception("Conta inativa");
 
             if (amount <= 0)
@@ -74,7 +74,7 @@ namespace PagueVeloz.Domain.Entities
 
         public void Capture(int amount)
         {
-            if (Status != StatusAccount.Active)
+            if (Status != AccountStatus.Active)
                 throw new Exception("Conta inativa");
 
             if (amount <= 0)
@@ -88,10 +88,10 @@ namespace PagueVeloz.Domain.Entities
 
         public void TransferTo(Account destination, int amount)
         {
-            if (Status != StatusAccount.Active)
+            if (Status != AccountStatus.Active)
                 throw new Exception("Conta origem inativa");
 
-            if (destination.Status != StatusAccount.Active)
+            if (destination.Status != AccountStatus.Active)
                 throw new Exception("Conta destino inativa");
 
             if (amount <= 0)

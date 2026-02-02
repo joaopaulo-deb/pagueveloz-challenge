@@ -3,15 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using PagueVeloz.Application.Accounts;
 using PagueVeloz.Application.Clients;
 using PagueVeloz.Application.Contracts;
+using PagueVeloz.Application.Publisher;
 using PagueVeloz.Application.Transactions;
 using PagueVeloz.Application.Transactions.Operations;
 using PagueVeloz.Repository.Context;
+using PagueVeloz.Repository.Publisher;
 using PagueVeloz.Repository.Repositories;
+using RabbitMQ.Client;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services
     .AddControllers()
@@ -26,6 +27,39 @@ builder.Services.AddSwaggerGen(_ =>
     _.UseInlineDefinitionsForEnums();
 });
 
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    //docker
+    /*var factory = new ConnectionFactory
+    {
+        HostName = "pv-rabbitmq",
+        UserName = "admin",
+        Password = "admin123"
+    };*/
+
+    //local
+    var factory = new ConnectionFactory
+    {
+        HostName = "localhost",
+        Port = 5672,
+        UserName = "admin",
+        Password = "admin123"
+    };
+
+    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+
+builder.Services.AddScoped<RabbitMqEventPublisher>();
+
+builder.Services.AddScoped<IEventPublisher>(sp =>
+{
+    var rabbit = sp.GetRequiredService<RabbitMqEventPublisher>();
+    var eventRepository = sp.GetRequiredService<IEventRepository>();
+
+    return new RetryEventPublisher(rabbit, eventRepository, maxAttempts: 5, baseDelayMs: 200);
+});
+
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IClientService, ClientService>();
@@ -34,6 +68,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IOperation, CreditOperation>();
 builder.Services.AddScoped<IOperation, DebitOperation>();
 builder.Services.AddScoped<IOperation, CaptureOperation>();

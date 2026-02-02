@@ -1,5 +1,6 @@
 ﻿using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
+using PagueVeloz.Application.Publisher;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
 
@@ -10,16 +11,22 @@ namespace PagueVeloz.Application.Transactions.Operations
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEventPublisher _publisher;
+        public IEventRepository _eventRepository;
         private string DESCRIPTION = "Depósito Inicial";
 
         public CreditOperation(
             IUnitOfWork unitOfWork,
             IAccountRepository accountRepository,
-            ITransactionRepository transactionRepository)
+            ITransactionRepository transactionRepository,
+            IEventPublisher publisher,
+            IEventRepository eventRepository)
         {
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
+            _publisher = publisher;
+            _eventRepository = eventRepository;
 
         }
 
@@ -47,6 +54,7 @@ namespace PagueVeloz.Application.Transactions.Operations
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
+                await PublishTransactionProcessedEventAsync(dto, account);
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.success);
 
                 return new TransactionOutputDto
@@ -123,5 +131,21 @@ namespace PagueVeloz.Application.Transactions.Operations
                 error_message = message
             };
         }
+
+        private async Task PublishTransactionProcessedEventAsync(TransactionInputDto dto, Account account, string queueOrExchange = "transactions.processed")
+        {
+            var evt = new TransactionProcessedEvent(
+                TransactionId: dto.Reference_id,
+                AccountId: account.Id,
+                Operation: dto.Operation,
+                Status: "success",
+                Amount: dto.Amount,
+                Currency: dto.Currency,
+                Timestamp: DateTime.UtcNow
+            );
+
+            await _publisher.PublishAsync(evt, queueOrExchange);
+        }
+
     }
 }

@@ -13,6 +13,7 @@ namespace PagueVeloz.Repository.Context
         public DbSet<Client> Client { get; set; }
         public DbSet<Account> Account { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
+        public DbSet<Event> Event { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +55,21 @@ namespace PagueVeloz.Repository.Context
             modelBuilder.Entity<Account>()
                 .Property(a => a.Status)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Event>(e =>
+            {
+                e.Property(t => t.Operation)
+                    .HasConversion<string>()
+                    .IsUnicode(false);
+
+                e.Property(t => t.Status)
+                    .HasConversion<string>()
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Event>()
+              .Property(a => a.Status)
+              .HasConversion<string>();
 
             modelBuilder.Entity<Account>()
             .Property(a => a.RowVersion)
