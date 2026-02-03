@@ -1,5 +1,6 @@
 ﻿using PagueVeloz.Application.Common;
 using PagueVeloz.Application.Contracts;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 
 namespace PagueVeloz.Application.Accounts
@@ -24,9 +25,8 @@ namespace PagueVeloz.Application.Accounts
             try
             {
                 var client = await GetOrCreateClientAsync(input.ClientId);
-                await _unitOfWork.SaveChangesAsync();
                         
-                var account = CreateAccount(client.Id, input );
+                var account = CreateAccount(client.Id, input);
                 await _unitOfWork.SaveChangesAsync();
 
                 account.GenerateCode();
@@ -52,16 +52,32 @@ namespace PagueVeloz.Application.Accounts
 
             client = new Client(clientId);
             _clientRepository.Create(client);
+            await _unitOfWork.SaveChangesAsync();
 
             return client;
         }
 
         private Account CreateAccount(int clientId, AccountCreateInputDto input)
         {
+            if (string.IsNullOrWhiteSpace(input.ClientId))
+                throw new ArgumentException("ClientId é obrigatório");
+
+            if (input.CreditLimit is null)
+                throw new ArgumentException("CreditLimit é obrigatório");
+
+            if (input.AvailableBalance is null)
+                throw new ArgumentException("AvailableBalance é obrigatório");
+
+            if (input.CreditLimit < 0)
+                throw new ArgumentException("CreditLimit não pode ser menor que 0");
+
+            if (input.AvailableBalance < 0)
+                throw new ArgumentException("AvailableBalance não pode ser menor que 0");
+
             var account = new Account(
                 clientId,
-                input.CreditLimit,
-                input.AvailableBalance
+                input.CreditLimit ?? 0,
+                input.AvailableBalance ?? 0
             );
 
             _accountRepository.Create(account);

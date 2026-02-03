@@ -1,9 +1,8 @@
 ﻿using PagueVeloz.Application.Common;
-using PagueVeloz.Application.Contracts;
 using PagueVeloz.Application.Publisher;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
-using System.Security.Principal;
 
 namespace PagueVeloz.Application.Transactions.Operations
 {
@@ -34,7 +33,7 @@ namespace PagueVeloz.Application.Transactions.Operations
         {
             var referenceId = dto.Reference_id.Trim().ToUpper();
 
-            var idempot = await _transactionRepository.GetByAccountAndReferenceIdAsync(sourceAccount.Id, referenceId);
+            var idempot = await _transactionRepository.GetAsync(referenceId, sourceAccount.Id);
 
             if (idempot != null)
             {

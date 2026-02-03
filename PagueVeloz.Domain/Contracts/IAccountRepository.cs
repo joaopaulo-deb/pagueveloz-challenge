@@ -1,7 +1,7 @@
 ﻿
 using PagueVeloz.Domain.Entities;
 
-namespace PagueVeloz.Application.Contracts
+namespace PagueVeloz.Domain.Contracts
 {
     public interface IAccountRepository : IBaseRepository<Account>
     {

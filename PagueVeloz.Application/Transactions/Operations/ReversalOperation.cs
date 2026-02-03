@@ -1,12 +1,12 @@
 ﻿using PagueVeloz.Application.Common;
-using PagueVeloz.Application.Contracts;
 using PagueVeloz.Application.Publisher;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
 
 namespace PagueVeloz.Application.Transactions.Operations
 {
-    public class ReversalOperation : ISingleAccountOperation
+    public class ReversalOperation : IReversalOperation
     {
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -29,34 +29,45 @@ namespace PagueVeloz.Application.Transactions.Operations
 
         public OperationType Type => OperationType.reversal;
 
-        public async Task<TransactionOutputDto> ExecuteAsync(Account account, TransactionInputDto dto)
+        public async Task<TransactionOutputDto> ExecuteAsync(string referenceId)
         {
-            var referenceId = dto.Reference_id.Trim().ToUpper();
+            var reference_id = referenceId.Trim().ToUpper();
 
-            var idempot = await _transactionRepository.GetByAccountAndReferenceIdAsync(account.Id, referenceId);
+            var transaction = await _transactionRepository.GetAsync(referenceId, null);
 
-            if (idempot != null)
+            if (transaction == null)
             {
-                return Fail(dto, "Operação já executada", account);
+                return Fail(referenceId, "Operação não encontrada");
             }
 
-            var transaction = await CreatePendingTransactionAsync(account, dto, dto.Operation, referenceId);
+            var account = await _accountRepository.Get(transaction.AccountId);
+
+            if (account == null)
+            {
+                return Fail(referenceId, "Conta da transação não encontrada");
+            }
+
+            var dto = BuildDto(account, transaction, reference_id);
 
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                account.Reversal();
+                
+
+                var newTransaction = await CreatePendingTransactionAsync(account, dto, OperationType.reversal, referenceId);
+                ApplyReversal(account, transaction);
+
                 _accountRepository.Update(account);
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
                 await PublishTransactionProcessedEventAsync(dto, account);
-                await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.success);
+                await UpdateTransactionStatusAsync(newTransaction.Id, TransactionStatus.success);
 
                 return new TransactionOutputDto
                 {
-                    transaction_id = dto.Reference_id + "-PROCESSED",
+                    transaction_id = referenceId + "-PROCESSED",
                     status = TransactionStatus.success,
                     balance = account.AvailableBalance,
                     reserved_balance = account.ReservedBalance,
@@ -70,14 +81,14 @@ namespace PagueVeloz.Application.Transactions.Operations
                 _unitOfWork.ClearTracking();
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.failed, "Conflito de concorrência");
 
-                return Fail(dto, "Conflito de concorrência: conta foi alterada por outra operação", account);
+                return Fail(referenceId, "Conflito de concorrência: conta foi alterada por outra operação", account);
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
                 _unitOfWork.ClearTracking();
                 await UpdateTransactionStatusAsync(transaction.Id, TransactionStatus.failed, ex.Message);
-                return Fail(dto, ex.Message, account);
+                return Fail(referenceId, ex.Message, account);
             }
         }
 
@@ -89,7 +100,7 @@ namespace PagueVeloz.Application.Transactions.Operations
                 dto.Amount,
                 TransactionStatus.pending,
                 dto.Currency,
-                referenceId,
+                $"{referenceId}-R",
                 DESCRIPTION
             );
 
@@ -115,11 +126,52 @@ namespace PagueVeloz.Application.Transactions.Operations
             await _unitOfWork.SaveChangesAsync();
         }
 
-        private TransactionOutputDto Fail(TransactionInputDto dto, string message, Account? account = null)
+        private static TransactionInputDto BuildDto(Account account, Transaction transaction, string referenceId)
+        {
+            return new TransactionInputDto
+            {
+                Operation = OperationType.reversal,
+                Amount = transaction.Amount,
+                Account_id = account.Code,
+                Currency = Currency.BRL,
+                Reference_id = referenceId
+            };
+        }
+
+        private static void ApplyReversal(Account account, Transaction originalTransaction)
+        {
+            switch (originalTransaction.Operation)
+            {
+                case OperationType.credit:
+                    account.Debit(originalTransaction.Amount);
+                    break;
+
+                case OperationType.debit:
+                    account.Credit(originalTransaction.Amount);
+                    break;
+
+                case OperationType.reserve:
+                    account.RevertReserve(originalTransaction.Amount);
+                    break;
+
+                case OperationType.capture:
+                    account.RevertCapture(originalTransaction.Amount);
+                    break;
+
+                case OperationType.transfer:
+                    // TODO
+                    throw new NotImplementedException("Reversão de transferência ainda não implementada.");
+
+                default:
+                    throw new InvalidOperationException($"Operação não suportada para reversão: {originalTransaction.Operation}");
+            }
+        }
+
+        private TransactionOutputDto Fail(string referenceId, string message, Account? account = null)
         {
             return new TransactionOutputDto
             {
-                transaction_id = $"{dto.Reference_id}-PROCESSED",
+                transaction_id = $"{referenceId}-PROCESSED",
                 status = TransactionStatus.failed,
                 balance = account?.AvailableBalance ?? 0,
                 reserved_balance = account?.ReservedBalance ?? 0,

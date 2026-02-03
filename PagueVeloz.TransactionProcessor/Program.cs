@@ -1,11 +1,11 @@
 
 using Microsoft.EntityFrameworkCore;
 using PagueVeloz.Application.Accounts;
-using PagueVeloz.Application.Clients;
 using PagueVeloz.Application.Contracts;
 using PagueVeloz.Application.Publisher;
 using PagueVeloz.Application.Transactions;
 using PagueVeloz.Application.Transactions.Operations;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Repository.Context;
 using PagueVeloz.Repository.Publisher;
 using PagueVeloz.Repository.Repositories;
@@ -62,7 +62,6 @@ builder.Services.AddScoped<IEventPublisher>(sp =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();

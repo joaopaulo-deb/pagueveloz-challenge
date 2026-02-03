@@ -18,7 +18,7 @@ namespace PagueVeloz.TransactionProcessor.Controllers
         }
 
         [HttpPost("")]
-        public async Task<ActionResult<Response<AccountCreateOutputDto>>> create(AccountCreateInputDto input)
+        public async Task<ActionResult<Response<AccountCreateOutputDto>>> create([FromBody] AccountCreateInputDto input)
         {
             var accounts = await _accountService.Create(input);
 

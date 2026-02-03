@@ -1,5 +1,5 @@
 ﻿
-namespace PagueVeloz.Application.Contracts
+namespace PagueVeloz.Domain.Contracts
 {
     public interface IUnitOfWork
     {

@@ -2,6 +2,7 @@
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Repository.Context;
 using Microsoft.EntityFrameworkCore;
+using PagueVeloz.Domain.Contracts;
 
 
 namespace PagueVeloz.Repository.Repositories

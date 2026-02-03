@@ -1,6 +1,6 @@
 ﻿using PagueVeloz.Domain.Entities;
 
-namespace PagueVeloz.Application.Contracts
+namespace PagueVeloz.Domain.Contracts
 {
     public interface IBaseRepository<T> where T : BaseEntity
     {

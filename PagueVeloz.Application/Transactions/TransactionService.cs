@@ -1,7 +1,9 @@
 ﻿using PagueVeloz.Application.Contracts;
 using PagueVeloz.Application.Transactions.Operations;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
+using static System.Net.WebRequestMethods;
 
 namespace PagueVeloz.Application.Transactions
 {
@@ -20,8 +22,16 @@ namespace PagueVeloz.Application.Transactions
         {
             try
             {
-                ValidadeEntry(input);
                 var operation = ValidateAndGetOperation(input.Operation);
+                ValidadeReference_id(input.Reference_id);
+
+                if (operation is IReversalOperation reversalOp)
+                {
+                    return await reversalOp.ExecuteAsync(input.Reference_id);
+                }
+
+                ValidadeEntry(input);
+
                 var account = await GetAndValidateAccount(input.Account_id);
 
                 if (operation is ISingleAccountOperation singleOp)
@@ -50,14 +60,27 @@ namespace PagueVeloz.Application.Transactions
             }
         }
 
-        private void ValidadeEntry(TransactionInputDto dto)
+        private void ValidadeEntry(TransactionInputDto input)
         {
-            if (dto.Amount <= 0)
-            {
-                throw new Exception("Amount deve ser maior que zero");
-            }
+            if (input is null)
+                throw new Exception("Input não pode ser nulo");
 
-            if (string.IsNullOrWhiteSpace(dto.Reference_id))
+            if (string.IsNullOrWhiteSpace(input.Account_id))
+                throw new Exception("Account_id é obrigatório");
+
+            if (input.Amount <= 0)
+                throw new Exception("Amount deve ser maior que zero");
+
+            if (input.Currency == default)
+                throw new Exception("Currency é obrigatório");
+
+            if (string.IsNullOrWhiteSpace(input.Reference_id))
+                throw new Exception("Reference_id é obrigatório");
+        }
+
+        private void ValidadeReference_id(string reference_Id)
+        {
+            if (string.IsNullOrWhiteSpace(reference_Id))
             {
                 throw new Exception("Reference_id é obrigatório");
             }
@@ -77,7 +100,12 @@ namespace PagueVeloz.Application.Transactions
 
         private IOperation? ValidateAndGetOperation(OperationType operation)
         {
-            return _operations.FirstOrDefault(_ => _.Type == operation);
+            var op = _operations.FirstOrDefault(_ => _.Type == operation); 
+            if (op == null)
+            {
+                throw new Exception("Operação inválida");
+            }
+            return op;
         }
     }
 }

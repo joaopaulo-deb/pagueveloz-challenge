@@ -26,22 +26,13 @@ namespace PagueVeloz.Domain.Entities
 
         public void Credit(int amount)
         {
-            if (Status != AccountStatus.Active)
-                throw new Exception("Conta inativa");
-
-            if (amount <= 0)
-                throw new Exception("Valor inválido");
-
+            validateStatusAndAmount(amount);
             AvailableBalance += amount;
         }
 
         public void Debit(int amount)
         {
-            if (Status != AccountStatus.Active)
-                throw new Exception("Conta inativa");
-
-            if (amount <= 0)
-                throw new Exception("Valor inválido");
+            validateStatusAndAmount(amount);
 
             var newBalance = AvailableBalance - amount;
             var maxNegativeBalance = -CreditLimit;
@@ -59,11 +50,7 @@ namespace PagueVeloz.Domain.Entities
 
         public void Reserve(int amount)
         {
-            if (Status != AccountStatus.Active)
-                throw new Exception("Conta inativa");
-
-            if (amount <= 0)
-                throw new Exception("Valor inválido");
+            validateStatusAndAmount(amount);
 
             if (amount > AvailableBalance)
                 throw new Exception("Saldo disponível insuficiente");
@@ -74,16 +61,29 @@ namespace PagueVeloz.Domain.Entities
 
         public void Capture(int amount)
         {
-            if (Status != AccountStatus.Active)
-                throw new Exception("Conta inativa");
-
-            if (amount <= 0)
-                throw new Exception("Valor inválido");
+            validateStatusAndAmount(amount);
 
             if (amount > ReservedBalance)
                 throw new Exception("Saldo reservado insuficiente");
 
             ReservedBalance -= amount;
+        }
+
+        public void RevertReserve(int amount)
+        {
+            validateStatusAndAmount(amount);
+
+            if (amount > ReservedBalance)
+                throw new Exception("Saldo reservado insuficiente");
+
+            AvailableBalance += amount;
+            ReservedBalance -= amount;
+        }
+
+        public void RevertCapture(int amount)
+        {
+            validateStatusAndAmount(amount);
+            ReservedBalance += amount;
         }
 
         public void TransferTo(Account destination, int amount)
@@ -124,6 +124,15 @@ namespace PagueVeloz.Domain.Entities
         public void GenerateCode()
         {
             Code = $"ACC-{Id:D3}";
+        }
+
+        private void validateStatusAndAmount(int amount)
+        {
+            if (Status != AccountStatus.Active)
+                throw new Exception("Conta inativa");
+
+            if (amount <= 0)
+                throw new Exception("Valor inválido");
         }
     }
 }

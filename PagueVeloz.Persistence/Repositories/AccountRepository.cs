@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PagueVeloz.Application.Contracts;
+using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Repository.Context;
 
