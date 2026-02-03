@@ -137,8 +137,8 @@ namespace Tests.Unit.Application.Operations
 
             var result = await sut.ExecuteAsync(source, dest, dto);
 
-            Assert.Equal(0, source.AvailableBalance);
-            Assert.Equal(70, source.CreditLimit);
+            Assert.Equal(-30, source.AvailableBalance);
+            Assert.Equal(100, source.CreditLimit);
             Assert.Equal(50, dest.AvailableBalance);
 
             Assert.Equal(TransactionStatus.success, result.status);

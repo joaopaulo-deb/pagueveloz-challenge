@@ -85,8 +85,8 @@ namespace Tests.Unit.Domain.Entities
 
             origin.TransferTo(dest, 50);
 
-            Assert.Equal(0, origin.AvailableBalance);
-            Assert.Equal(70, origin.CreditLimit);
+            Assert.Equal(-30, origin.AvailableBalance);
+            Assert.Equal(100, origin.CreditLimit);
             Assert.Equal(50, dest.AvailableBalance);
         }
 
