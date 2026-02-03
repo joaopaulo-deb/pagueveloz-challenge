@@ -3,7 +3,6 @@ using PagueVeloz.Application.Transactions.Operations;
 using PagueVeloz.Domain.Contracts;
 using PagueVeloz.Domain.Entities;
 using PagueVeloz.Domain.Enums;
-using static System.Net.WebRequestMethods;
 
 namespace PagueVeloz.Application.Transactions
 {

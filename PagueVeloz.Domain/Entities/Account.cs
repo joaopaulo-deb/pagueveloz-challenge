@@ -97,28 +97,13 @@ namespace PagueVeloz.Domain.Entities
             if (amount <= 0)
                 throw new Exception("Valor inválido");
 
-            var availableFunds = AvailableBalance + CreditLimit;
+            //var availableFunds = AvailableBalance + CreditLimit;
 
-            if (amount > availableFunds)
+            if (AvailableBalance - amount < -CreditLimit)
                 throw new Exception("Saldo insuficiente");
 
-            if (amount <= AvailableBalance)
-            {
-                AvailableBalance -= amount;
-            }
-            else
-            {
-                var remaining = amount - AvailableBalance;
-                AvailableBalance = 0;
-                CreditLimit -= remaining;
-            }
-
+            AvailableBalance -= amount;
             destination.AvailableBalance += amount;
-        }
-
-        public void Reversal()
-        {
-           
         }
 
         public void GenerateCode()
